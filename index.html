@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>3D Models</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #cccccc;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				background-color: #050505;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+			a {
+				color: #0080ff;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+
+		<script src="js/three.js"></script>
+		<script src="js/camera.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/stats.min.js"></script>
+		<script src='js/tween.min.js'></script>
+
+		<script>
+
+		var completedCameraMoves = [];
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			var container, stats;
+			var camera, scene, renderer;
+			var mesh;
+			init();
+			animate();
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+        //Set up scene camera and lights
+
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
+				camera.position.z = 0 ;
+        camera.position.y = 50;
+        camera.rotation.x = -Math.PI / 2;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+				//
+				scene.add( new THREE.AmbientLight( 0x444444 ) );
+				var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				light1.position.set( 1, 1, 1 );
+				scene.add( light1 );
+				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				light2.position.set( 0, -1, 0 );
+				scene.add( light2 );
+        //////////////////////////
+				var squares = 100;
+				var geometry = new THREE.BufferGeometry();
+				var positions = new Float32Array( squares * 3 * 3 * 2 );
+				var normals = new Float32Array( squares * 3 * 3 * 2 );
+				var colors = new Float32Array( squares * 3 * 3 * 2 );
+				var color = new THREE.Color();
+
+        // var n = 800, n2 = n/2;	// triangles spread in the cube
+				// var d = 3, d2 = d/2;	// individual triangle size
+
+        var pA = new THREE.Vector3();
+				var pB = new THREE.Vector3();
+				var pC = new THREE.Vector3();
+				var cb = new THREE.Vector3();
+				var ab = new THREE.Vector3();
+				//
+        // var xPos = 0;
+        // var xShift = 0.1;
+        // var yPos = 0;
+        // var ySpread = 20;
+        // var yShift = Math.PI / 100;
+        // var zSpread = 30;
+				// var directionG = 1;
+
+				var arrPos = 0
+				var offset = Math.sqrt(squares) / 2
+				for (var j = 0; j < squares / Math.sqrt(squares); j++ ) {
+
+				for (var i = 0; i < squares / Math.sqrt(squares); i++ ) {
+
+
+
+        	// positions
+					// 1
+					var ax = i - offset
+					var ay = positions[arrPos - 13] || Math.random()
+					var az = j - offset
+					// 2
+					var bx = i + 1 - offset
+					var by = positions[arrPos - Math.sqrt(squares) * 18 + 17] || Math.random()
+					var bz = j - offset
+					// 3
+					var cx = i - offset
+					var cy = positions[arrPos - 2] || Math.random()
+					var cz = j + 1 - offset
+
+					// 2
+					var dx = i + 1 - offset
+					var dy = positions[arrPos - Math.sqrt(squares) * 18 + 17] || Math.random()
+					var dz = j - offset
+					// 3
+					var ex = i - offset
+					var ey = positions[arrPos - 2] || Math.random()
+					var ez = j + 1 - offset
+					// 4
+					var fx = i + 1 - offset
+					var fy = 0 || Math.random()
+					var fz = j + 1 - offset
+
+					// console.log('square' + i)
+					// console.log(ax, ay, az)
+					// console.log(bx, by, bz)
+					// console.log(cx, cy, cz)
+					// console.log(dx, dy, dz)
+					// console.log(ex, ey, ez)
+					// console.log(fx, fy, fz)
+					//console.log(i)
+
+
+					positions[ arrPos ] = ax;
+					positions[ arrPos + 1 ] = ay;
+					positions[ arrPos + 2 ] = az;
+					positions[ arrPos + 3 ] = bx;
+					positions[ arrPos + 4 ] = by;
+					positions[ arrPos + 5 ] = bz;
+					positions[ arrPos + 6 ] = cx;
+					positions[ arrPos + 7 ] = cy;
+					positions[ arrPos + 8 ] = cz;
+					positions[ arrPos + 9 ] = dx;
+					positions[ arrPos + 10 ] = dy;
+					positions[ arrPos + 11 ] = dz;
+					positions[ arrPos + 12 ] = ex;
+					positions[ arrPos + 13 ] = ey;
+					positions[ arrPos + 14 ] = ez;
+					positions[ arrPos + 15 ] = fx;
+					positions[ arrPos + 16 ] = fy;
+					positions[ arrPos + 17 ] = fz;
+
+					//console.log(positions)
+
+
+
+					//
+          // flat face normals
+					pA.set( ax, ay, az );
+					pB.set( bx, by, bz );
+					pC.set( cx, cy, cz );
+					cb.subVectors( pC, pB );
+					ab.subVectors( pA, pB );
+					cb.cross( ab );
+					cb.normalize();
+					var nx = cb.x;
+					var ny = cb.y;
+					var nz = cb.z;
+
+					normals[ arrPos ] = nx;
+					normals[ arrPos + 1 ] = ny;
+					normals[ arrPos + 2 ] = nz;
+					normals[ arrPos + 3 ] = nx;
+					normals[ arrPos + 4 ] = ny;
+					normals[ arrPos + 5 ] = nz;
+					normals[ arrPos + 6 ] = nx;
+					normals[ arrPos + 7 ] = ny;
+					normals[ arrPos + 8 ] = nz;
+					normals[ arrPos + 9 ] = nx;
+					normals[ arrPos + 10 ] = ny;
+					normals[ arrPos + 11 ] = nz;
+					normals[ arrPos + 12 ] = nx;
+					normals[ arrPos + 13 ] = ny;
+					normals[ arrPos + 14 ] = nz;
+					normals[ arrPos + 15 ] = nx;
+					normals[ arrPos + 16 ] = ny;
+					normals[ arrPos + 17 ] = nz;
+
+          //Colours
+
+					var vx = Math.random() + 0.1;
+					var vy = Math.random() + 0.1;
+					var vz = Math.random() + 0.1;
+
+					color.setRGB( vx, vy, vz );
+
+					colors[ arrPos ] = color.r;
+					colors[ arrPos + 1 ] = color.g;
+					colors[ arrPos + 2 ] = color.b;
+					colors[ arrPos + 3 ] = color.r;
+					colors[ arrPos + 4 ] = color.g;
+					colors[ arrPos + 5 ] = color.b;
+					colors[ arrPos + 6 ] = color.r;
+					colors[ arrPos + 7 ] = color.g;
+					colors[ arrPos + 8 ] = color.b;
+					colors[ arrPos + 9 ] = color.r;
+					colors[ arrPos + 10 ] = color.g;
+					colors[ arrPos + 11 ] = color.b;
+					colors[ arrPos + 12 ] = color.r;
+					colors[ arrPos + 13 ] = color.g;
+					colors[ arrPos + 14 ] = color.b;
+					colors[ arrPos + 15 ] = color.r;
+					colors[ arrPos + 16 ] = color.g;
+					colors[ arrPos + 17 ] = color.b;
+
+					arrPos += 18
+
+				}
+
+			}
+
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.computeBoundingSphere();
+
+				var material = new THREE.MeshPhongMaterial( {
+					color: 0xaaaaaa, specular: 0xffffff, shininess: 500,
+					side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+				} );
+
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+				//
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( scene.fog.color );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				container.appendChild( renderer.domElement );
+				//
+				stats = new Stats();
+				container.appendChild( stats.dom );
+				//
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+			function render() {
+
+				// var a = new THREE.Vector3(10000, -100, 200)
+				// var b = new THREE.Vector3(Math.PI / 50, Math.PI/4, Math.PI / 50)
+				//
+				//
+				// if(completedCameraMoves.length === 0) {
+				// 	Move(20000, a, b, sinFastMove, sinFastMove)
+				// }
+				//
+				// var a = new THREE.Vector3(3000, 0, -200)
+				// var b = new THREE.Vector3(-Math.PI / 50, -Math.PI/4, -Math.PI / 50)
+				//
+				// if(completedCameraMoves.length === 1) {
+				// 	Move(6000, a, b,sinSlowMove, sinSlowMove)
+				// }
+				//
+				// var a = new THREE.Vector3(5000, 0, 0)
+				// var b = new THREE.Vector3(-20 * Math.PI, 0, 0)
+				//
+				// if(completedCameraMoves.length === 2) {
+				// 	Move(20000, a, b, squaredMove, squaredMove)
+				// }
+				//
+				// var a = new THREE.Vector3(-5000, 0, 0)
+				// var b = new THREE.Vector3(20 * Math.PI, 0, 0)
+				//
+				// if(completedCameraMoves.length === 3) {
+				// 	Move(20000, a, b, squaredSlowDownMove, squaredSlowDownMove)
+				// }
+				//console.log(camera)
+
+
+
+// 				var timeNow = Date.now()
+//
+// 				if (lastTime != 0) {
+// 					var elapsed = timeNow - lastTime //number of milliseconds since last render
+// //Sine smoothing - uses integral of sin between 0 & PI which is 2. applies this to move of 1500 and 4000 millisecond timespan
+//
+// // TODO: Make into seperate function that will stop when finished and can be genralised to other axis (and rotation)
+// 					if (lastSinPos < Math.PI) {
+// 						camera.position.x += (4000 / 2) * (-Math.cos(lastSinPos + (elapsed * Math.PI) / 5000) + Math.cos(lastSinPos))
+// 						lastSinPos += (elapsed * Math.PI) / 5000
+// 						totalElapsed += elapsed
+// 					} else {
+// 						completedCameraMoves.push('sinPan')
+// 						lastTime = 0
+// 						lastSinPos = 0
+// 						totalElapsed = 0
+// 					}
+// 				}
+// 				lastTime = timeNow
+// 				}
+//
+// 				if(completedCameraMoves.length === 1) {
+// 				var timeNow = Date.now()
+//
+// 				if (lastTime != 0) {
+// 					var elapsed = timeNow - lastTime //number of milliseconds since last render
+// //Sine smoothing - uses integral of sin between 0 & PI which is 2. applies this to move of 1500 and 4000 millisecond timespan
+//
+// // TODO: Make into seperate function that will stop when finished and can be genralised to other axis (and rotation)
+// 					if (lastSinPos < Math.PI) {
+// 						camera.position.x += (4000 / 2) * (-Math.cos(lastSinPos + (elapsed * Math.PI) / 5000) + Math.cos(lastSinPos))
+// 						lastSinPos += (elapsed * Math.PI) / 5000
+// 						totalElapsed += elapsed
+// 					} else {
+// 						completedCameraMoves.push('sinPan')
+// 					}
+// 				}
+// 				lastTime = timeNow
+// 				}
+
+
+				//console.log(totalElapsed)
+				//console.log(camera.position.x)
+
+				//camera.position.x += 5;
+        // camera.position.z += 0.0001
+				// camera.rotation.y += -0.00001;
+
+				//console.log(completedCameraMoves)
+				//console.log(completedCameraMoves)
+				renderer.render( scene, camera );
+
+				//console.log(camera.position.x)
+				//camera.position.x += cameraChange * (gaussianMove(delta2, mu, (time + 0.005 - time1)))
+
+			}
+
+			function animate() {
+				requestAnimationFrame( animate );
+				render();
+				stats.update();
+			}
+
+		</script>
+
+	</body>
+</html>

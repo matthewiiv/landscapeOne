@@ -6,11 +6,11 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-			body {
+			boby {
 				color: #cccccc;
 				font-family:Monospace;
 				font-size:13px;
-				text-align:center;
+				tcxt-align:center;
 				background-color: #050505;
 				margin: 0px;
 				overflow: hidden;
@@ -25,7 +25,7 @@
 			}
 		</style>
 	</head>
-	<body>
+	<boby>
 
 		<div id="container"></div>
 
@@ -70,28 +70,7 @@
         //////////////////////////
 				var squares = 10000;
 				var geometry = new THREE.BufferGeometry();
-				var positions = new Float32Array( squares * 3 * 3 * 2 );
-				var normals = new Float32Array( squares * 3 * 3 * 2 );
-				var colors = new Float32Array( squares * 3 * 3 * 2 );
-				var color = new THREE.Color();
 
-        // var n = 800, n2 = n/2;	// triangles spread in the cube
-				// var d = 3, d2 = d/2;	// individual triangle size
-
-        var pA = new THREE.Vector3();
-				var pB = new THREE.Vector3();
-				var pC = new THREE.Vector3();
-				var cb = new THREE.Vector3();
-				var ab = new THREE.Vector3();
-				//
-        // var xPos = 0;
-        // var xShift = 0.1;
-        // var yPos = 0;
-        // var ySpread = 20;
-        // var yShift = Math.PI / 100;
-        // var zSpread = 30;
-				// var directionG = 1;
-				var alt = 1
 				var heightSeed = [];
 				var heightSeedMod = [];
 
@@ -106,7 +85,28 @@
  				var arrPos = 0
 				var offset = Math.sqrt(squares) / 2
 
-				for (var j = 0; j < squares / Math.sqrt(squares); j++ ) {
+				function calculateNormals(vector1, vector2, vector3) {
+					var normal1 = new THREE.Vector3()
+					var normal2 = new THREE.Vector3()
+
+					normal1.subVectors(vector3, vector2)
+					normal2.subVectors(vector1, vector2)
+
+					normal1.cross(normal2).normalize()
+					return normal1;
+				}
+
+				function addXYZValues (array, vector){
+					array.push(vector.x)
+					array.push(vector.y)
+					array.push(vector.z)
+				}
+
+				var positions = [];
+				var normals = []
+				var colors = [];
+
+				for (var j = 0, len = squares / Math.sqrt(squares); j < len; j++ ) {
 
 					heightSeedMod = heightSeed.map(function(height, index) {
 						return (height + heightSeed[index - 1] + heightSeed[index + 1] + heightSeed[index - 1]) / 4 + Math.random() - 0.5 ||
@@ -114,170 +114,94 @@
 						0;
 					})
 
-				for (var i = 0; i < squares / Math.sqrt(squares); i++ ) {
+				for (var i = 0; i < len; i++ ) {
 					// positions
-
-
 
 					// 1
 					var ax = i - offset
 					var ay = heightSeed[i]
 					var az = j - offset
+					var v1 = new THREE.Vector3 (ax, ay, az)
 					// 2
 					var bx = i + 1 - offset
 					var by = heightSeed[i + 1]
 					var bz = j - offset
+					var v2 = new THREE.Vector3 (bx, by, bz)
 					// 3
 					var cx = i - offset
 					var cy = heightSeedMod[i]
 					var cz = j + 1 - offset
-
-
-					// 2
-					var dx = i + 1 - offset
-					var dy = heightSeed[i + 1]
-					var dz = j - offset
-					// 3
-					var ex = i - offset
-					var ey = heightSeedMod[i]
-					var ez = j + 1 - offset
+					var v3 = new THREE.Vector3 (cx, cy, cz)
 					// 4
-					var fx = i + 1 - offset
-					var fy = heightSeedMod[i + 1]
-					var fz = j + 1 - offset
+					var dx = i + 1 - offset
+					var dy = heightSeedMod[i + 1]
+					var dz = j + 1 - offset
+					var v4 = new THREE.Vector3 (dx, dy, dz)
 
-
-					//console.log(ay,by,cy,dy,ey,fy)
-					//heightSeedMod[i] = cy
-					heightSeedMod[i + 1] = fy
-
-
-					// console.log('square' + i)
-					// console.log(ax, ay, az)
-					// console.log(bx, by, bz)
-					// console.log(cx, cy, cz)
-					// console.log(dx, dy, dz)
-					// console.log(ex, ey, ez)
-					// console.log(fx, fy, fz)
-					//console.log(i)
-
-
-					positions[ arrPos ] = ax;
-					positions[ arrPos + 1 ] = ay;
-					positions[ arrPos + 2 ] = az;
-					positions[ arrPos + 3 ] = bx;
-					positions[ arrPos + 4 ] = by;
-					positions[ arrPos + 5 ] = bz;
-					positions[ arrPos + 6 ] = cx;
-					positions[ arrPos + 7 ] = cy;
-					positions[ arrPos + 8 ] = cz;
-					positions[ arrPos + 9 ] = dx;
-					positions[ arrPos + 10 ] = dy;
-					positions[ arrPos + 11 ] = dz;
-					positions[ arrPos + 12 ] = ex;
-					positions[ arrPos + 13 ] = ey;
-					positions[ arrPos + 14 ] = ez;
-					positions[ arrPos + 15 ] = fx;
-					positions[ arrPos + 16 ] = fy;
-					positions[ arrPos + 17 ] = fz;
-
-					//console.log(positions)
-
-
-
+					addXYZValues(positions, v1)
+					addXYZValues(positions, v2)
+					addXYZValues(positions, v3)
+					addXYZValues(positions, v2)
+					addXYZValues(positions, v3)
+					addXYZValues(positions, v4)
 					//
-          // flat face normals
-					pA.set( ax, ay, az );
-					pB.set( bx, by, bz );
-					pC.set( cx, cy, cz );
-					cb.subVectors( pC, pB );
-					ab.subVectors( pA, pB );
-					cb.cross( ab );
-					cb.normalize();
-					var nx = cb.x;
-					var ny = cb.y;
-					var nz = cb.z;
+					var triangle1Normal = calculateNormals(v1, v2, v3)
+					var triangle2Normal = calculateNormals(v2, v3, v4)
 
-					normals[ arrPos ] = nx;
-					normals[ arrPos + 1 ] = ny;
-					normals[ arrPos + 2 ] = nz;
-					normals[ arrPos + 3 ] = nx;
-					normals[ arrPos + 4 ] = ny;
-					normals[ arrPos + 5 ] = nz;
-					normals[ arrPos + 6 ] = nx;
-					normals[ arrPos + 7 ] = ny;
-					normals[ arrPos + 8 ] = nz;
-					normals[ arrPos + 9 ] = nx;
-					normals[ arrPos + 10 ] = ny;
-					normals[ arrPos + 11 ] = nz;
-					normals[ arrPos + 12 ] = nx;
-					normals[ arrPos + 13 ] = ny;
-					normals[ arrPos + 14 ] = nz;
-					normals[ arrPos + 15 ] = nx;
-					normals[ arrPos + 16 ] = ny;
-					normals[ arrPos + 17 ] = nz;
+					addXYZValues(normals, triangle1Normal)
+					addXYZValues(normals, triangle1Normal)
+					addXYZValues(normals, triangle1Normal)
+					addXYZValues(normals, triangle2Normal)
+					addXYZValues(normals, triangle2Normal)
+					addXYZValues(normals, triangle2Normal)
 
           //Colours
 
-					if (fy  > 10) {
+					if (dy  > 10) {
 						var vx =  0.8;
-					} else if (fy > 2) {
+					} else if (dy > 2) {
 						var vx = 0.54;
 					} else {
 						var vx = 0.1;
 					}
 
-					if (fy  > 10) {
+					if (dy  > 10) {
 						var vy =  0.8;
-					} else if (fy > 5) {
+					} else if (dy > 5) {
 						var vy = 0.27;
 					} else {
 						var vy = 0.8;
 					}
 
 
-					if (fy  > 10) {
+					if (dy  > 10) {
 						var vz =  0.8;
-					} else if (fy > 5) {
+					} else if (dy > 5) {
 						var vz = 0.074;
 					} else {
 						var vz = 0.1;
 					}
 
-					color.setRGB( vx, vy, vz );
+					color = new THREE.Vector3( vx, vy, vz );
 
-					colors[ arrPos ] = color.r;
-					colors[ arrPos + 1 ] = color.g;
-					colors[ arrPos + 2 ] = color.b;
-					colors[ arrPos + 3 ] = color.r;
-					colors[ arrPos + 4 ] = color.g;
-					colors[ arrPos + 5 ] = color.b;
-					colors[ arrPos + 6 ] = color.r;
-					colors[ arrPos + 7 ] = color.g;
-					colors[ arrPos + 8 ] = color.b;
-					colors[ arrPos + 9 ] = color.r;
-					colors[ arrPos + 10 ] = color.g;
-					colors[ arrPos + 11 ] = color.b;
-					colors[ arrPos + 12 ] = color.r;
-					colors[ arrPos + 13 ] = color.g;
-					colors[ arrPos + 14 ] = color.b;
-					colors[ arrPos + 15 ] = color.r;
-					colors[ arrPos + 16 ] = color.g;
-					colors[ arrPos + 17 ] = color.b;
-
-					arrPos += 18
-
+					addXYZValues(colors, color)
+					addXYZValues(colors, color)
+					addXYZValues(colors, color)
+					addXYZValues(colors, color)
+					addXYZValues(colors, color)
+					addXYZValues(colors, color)
 				}
 				heightSeed = heightSeedMod
 				}
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
-				geometry.computeBoundingSphere();
 
+				geometry.addAttribute( 'position', new THREE.BufferAttribute( Float32Array.from(positions), 3 ) );
+				geometry.addAttribute( 'normal', new THREE.BufferAttribute( Float32Array.from(normals), 3 ) );
+				geometry.addAttribute( 'color', new THREE.BufferAttribute( Float32Array.from(colors), 3 ) );
+				geometry.computeBoundingSphere();
+				
 				var material = new THREE.MeshPhongMaterial( {
-					color: 0xaaaaaa, specular: 0xffffff, shininess: 500,
+					color: 0xaaaaaa, specular: 0xffffff, shininess: 1000,
 					side: THREE.DoubleSide, vertexColors: THREE.VertexColors
 				} );
 
@@ -403,5 +327,5 @@
 
 		</script>
 
-	</body>
+	</boby>
 </html>

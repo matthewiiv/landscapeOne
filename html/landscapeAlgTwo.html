@@ -6,7 +6,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-			boby {
+			body {
 				color: #cccccc;
 				font-family:Monospace;
 				font-size:13px;
@@ -25,17 +25,16 @@
 			}
 		</style>
 	</head>
-	<boby>
+	<body>
 
 		<div id="container"></div>
 
-
-		<script src="js/three.js"></script>
-		<script src="js/camera.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/stats.min.js"></script>
-		<script src='js/tween.min.js'></script>
-
+    <script src="lib/three.js"></script>
+		<script src="lib/Detector.js"></script>
+		<script src="lib/stats.min.js"></script>
+		<script src='lib/tween.min.js'></script>
+    <script src="js/camera.js"></script>
+    <script src="js/terrainHeightAlgorithm.js"></script>
 		<script>
 
 		var completedCameraMoves = [];
@@ -74,13 +73,13 @@
 				var heightSeed = [];
 				var heightSeedMod = [];
 
-				for (var k = 0; k < Math.sqrt(squares) + 1; k++) {
-					if (k < Math.sqrt(squares) / 2) {
-						heightSeed.push(heightSeed[k-1] + Math.random() - 0.2 || 0)
-					} else {
-						heightSeed.push(heightSeed[k-1] + Math.random() - 0.8 || 0)
-					}
-				}
+				// for (var k = 0; k < Math.sqrt(squares) + 1; k++) {
+				// 	if (k < Math.sqrt(squares) / 2) {
+				// 		heightSeed.push(heightSeed[k-1] + Math.random() - 0.2 || 0)
+				// 	} else {
+				// 		heightSeed.push(heightSeed[k-1] + Math.random() - 0.8 || 0)
+				// 	}
+				// }
 
  				var arrPos = 0
 				var offset = Math.sqrt(squares) / 2
@@ -102,29 +101,42 @@
 					array.push(vector.z)
 				}
 
+        function addColors(vector) {
+          if (vector.y > 10) {
+            return new THREE.Vector3(0.8, 0.8, 0.8);
+          } else if (vector.y > 5) {
+            return new THREE.Vector3(0.54, 0.27, 0.074);
+          } else {
+            return new THREE.Vector3(0.1, 0.8, 0.1);
+            // for (var j = 0, len = squares / Math.sqrt(squares); j < len; j++ ) {
+          }
+        }
+
 				var positions = [];
 				var normals = []
 				var colors = [];
 
-				for (var j = 0, len = squares / Math.sqrt(squares); j < len; j++ ) {
+				//
+				// 	for (var i = 0; i < len; i++ ) {
+				//
+				//
+				//
+				// 	}
+				// }
 
-						heightSeedMod = heightSeed.map(function(height, index) {
-							return (height + heightSeed[index - 1] + heightSeed[index + 1] + heightSeed[index - 1]) / 4 + Math.random() - 0.5 ||
-							(height + heightSeed[index + 1]) / 2 + Math.random() - 0.5 ||
-							0;
-						})
+
+				for (var j = 0, len = squares / Math.sqrt(squares); j < len; j++ ) {
 
 					for (var i = 0; i < len; i++ ) {
 						// positions
-
 						// 1
-						var v1 = new THREE.Vector3 (i - offset, heightSeed[i], j - offset)
+						var v1 = new THREE.Vector3 (i - offset, Math.random() < 0.0002 ? 20 : 0, j - offset)
 						// 2
-						var v2 = new THREE.Vector3 (i + 1 - offset, heightSeed[i + 1], j - offset)
+						var v2 = new THREE.Vector3 (i + 1 - offset, 0, j - offset)
 						// 3
-						var v3 = new THREE.Vector3 (i - offset, heightSeedMod[i], j + 1 - offset)
+						var v3 = new THREE.Vector3 (i - offset, 0, j + 1 - offset)
 						// 4
-						var v4 = new THREE.Vector3 (i + 1 - offset, heightSeedMod[i + 1], j + 1 - offset)
+						var v4 = new THREE.Vector3 (i + 1 - offset, 0, j + 1 - offset)
 
 						addXYZValues(positions, v1)
 						addXYZValues(positions, v2)
@@ -142,19 +154,7 @@
 						addXYZValues(normals, triangle2Normal)
 						addXYZValues(normals, triangle2Normal)
 						addXYZValues(normals, triangle2Normal)
-
 	          //Colours
-
-						function addColors(vector) {
-							if (vector.y > 10) {
-								return new THREE.Vector3(0.8, 0.8, 0.8);
-							} else if (vector.y > 5) {
-								return new THREE.Vector3(0.54, 0.27, 0.074);
-							} else {
-								return new THREE.Vector3(0.1, 0.8, 0.1);
-							}
-						}
-
 						addXYZValues(colors, addColors(v1))
 						addXYZValues(colors, addColors(v2))
 						addXYZValues(colors, addColors(v3))
@@ -162,7 +162,7 @@
 						addXYZValues(colors, addColors(v3))
 						addXYZValues(colors, addColors(v4))
 					}
-					heightSeed = heightSeedMod
+					// heightSeed = heightSeedMod
 				}
 
 
@@ -211,5 +211,5 @@
 
 		</script>
 
-	</boby>
+	</body>
 </html>
